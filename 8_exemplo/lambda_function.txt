@@ -1,0 +1,19 @@
+import json 
+
+import boto3
+client = boto3.client('bedrock-runtime')
+
+def lambda_handler( event, context):
+
+
+    response = client.invoke_model(
+
+    accept ='application/json',
+    body = json.dumps({"prompt": "Hello", "temperature": 0.9, "max_tokens": 20 }),
+    contentType='application/json',
+    modelId='cohere.command-text-v14')
+    print(response['body'])
+
+    return {
+    'statusCode': 200,
+    'body': json.dumps('Hello from Lambda')}
