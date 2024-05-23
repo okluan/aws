@@ -7,7 +7,7 @@ from custom_encoder import CustomEncoder
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-dynamodbTableName = 'product-inventory'
+dynamodbTableName = '13-exemplo-product-inventory'
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(dynamodbTableName)
 
@@ -28,32 +28,32 @@ def lambda_handler(event, context):
     if httpMethod == getMethod and path == healthPath:
         response = buildResponse(200)
     elif httpMethod == getMethod and path == productPath:
-        response = getProduct(event["queryStringParameters"]["productId"])
+        response = getProduct(event["queryStringParameters"]["productid"])
     elif httpMethod == getMethod and path == productsPath:
         response = getProducts()
     elif httpMethod == postMethod and path == productPath:
         response = saveProduct(json.loads(event["body"]))
     elif httpMethod == patchMethod and path == productPath:
         requestBody = json.loads(event["body"])
-        response = modifyProduct(requestBody["productId"], requestBody["updateKey"], requestBody["updateValue"])
+        response = modifyProduct(requestBody["productid"], requestBody["updateKey"], requestBody["updateValue"])
     elif httpMethod == deleteMethod and path == productPath:
         requestBody = json.loads(event["body"])
-        response = deleteProduct(requestBody["productId"])
+        response = deleteProduct(requestBody["productid"])
     else:
         response = buildResponse(404, "Not Found")
     return response 
 
-def getProduct(productId):
+def getProduct(productid):
     try:
         response = table.get_item(
             Key={
-                "productId": productId
+                "productid": productid
             }
         )
         if "Item" in response:
             return buildResponse(200, response["Item"])
         else:
-            return buildResponse(404, {"Message": "ProductId: {0}s not found".format(productId)})
+            return buildResponse(404, {"Message": "Productid: {0}s not found".format(productid)})
     except:
         logger.exception("Do your custom error handling here. I am just gonna log it our here!!")
 
@@ -85,11 +85,11 @@ def saveProduct(requestBody):
     except:
         logger.exception("Do your custom error handling here. I am just gonna log it our here!!")
 
-def modifyProduct(productId, updateKey, updateValue):
+def modifyProduct(productid, updateKey, updateValue):
     try:
         response = table.update_item(
             Key={
-                "productId": productId
+                "productid": productid
             },
 
             UpdateExpression="set {0}s = :value".format(updateKey),
@@ -107,11 +107,11 @@ def modifyProduct(productId, updateKey, updateValue):
     except:
         logger.exception("Do your custom error handling here. I am just gonna log it our here!!")
 
-def deleteProduct(productId):
+def deleteProduct(productid):
     try:
         response = table.delete_item(
             Key={
-                "productId": productId
+                "productid": productid
             },
             ReturnValues="ALL_OLD"
         )
